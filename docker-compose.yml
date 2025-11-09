@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: ea-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ea_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - ea-postgres-data:/var/lib/postgresql/data
+
+  backend:
+    build: ./Equipment Accounting Backend
+    container_name: ea-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ea_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      JWT_SECRET: secret
+    depends_on:
+      - db
+
+volumes:
+  ea-postgres-data:
+
