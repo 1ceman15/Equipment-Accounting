@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="create-tables" author="Muhammed">
+
+        <createTable tableName="department">
+            <column name="id" type="int4">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="employer">
+            <column name="id" type="int4">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="department_id" type="int4">
+                <constraints foreignKeyName="fk_department_id" references="department(id)" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="age" type="int4">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="equipment">
+            <column name="id" type="int4">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employer_id" type="int4">
+                <constraints foreignKeyName="fk_employer_id" references="employer(id)" nullable="false"/>
+            </column>
+            <column name="status" type="int4">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="date">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <sql>
+            ALTER TABLE equipment
+            ADD CONSTRAINT chk_status_range
+            CHECK (status BETWEEN 1 AND 5)
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE equipment
+                DROP CONSTRAINT chk_status_range
+            </sql>
+            <dropTable tableName="equipment"/>
+            <dropTable tableName="employer"/>
+            <dropTable tableName="department"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
