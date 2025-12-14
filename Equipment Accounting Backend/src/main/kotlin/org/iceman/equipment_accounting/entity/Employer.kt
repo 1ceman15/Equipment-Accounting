@@ -10,7 +10,7 @@ data class Employer(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    val id: Int,
+    val id: Long,
 
     @Column(name = "name", nullable = false, length = 100)
     val name: String,

@@ -11,7 +11,7 @@ data class Equipment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    val id: Int = 0,
+    val id: Long,
 
     @Column(name = "name", nullable = false, length = 250)
     val name: String,
