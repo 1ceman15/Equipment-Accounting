@@ -28,6 +28,6 @@ data class Equipment(
         nullable = false,
         foreignKey = ForeignKey(name = "fk_employer_id")
     )
-    val employer: Employer,
+    val employer: Employer? = null,
 
 ) : Serializable

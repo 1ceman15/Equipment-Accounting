@@ -41,9 +41,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="employer_id" type="int4">
-                <constraints foreignKeyName="fk_employer_id" references="employer(id)" nullable="false"/>
+                <constraints foreignKeyName="fk_employer_id" references="employer(id)" nullable="true"/>
             </column>
-            <column name="status" type="int4">
+            <column name="status" type="varchar(250)">
                 <constraints nullable="false"/>
             </column>
             <column name="start_date" type="date">
@@ -51,17 +51,7 @@
             </column>
         </createTable>
 
-        <sql>
-            ALTER TABLE equipment
-            ADD CONSTRAINT chk_status_range
-            CHECK (status BETWEEN 1 AND 5)
-        </sql>
-
         <rollback>
-            <sql>
-                ALTER TABLE equipment
-                DROP CONSTRAINT chk_status_range
-            </sql>
             <dropTable tableName="equipment"/>
             <dropTable tableName="employer"/>
             <dropTable tableName="department"/>

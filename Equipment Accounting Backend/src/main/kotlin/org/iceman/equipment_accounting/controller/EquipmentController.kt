@@ -16,13 +16,13 @@ class EquipmentController(
     private val equipmentService: EquipmentService
 ) {
     @GetMapping("/", "")
-    fun getAllDepartments(): ResponseEntity<List<Equipment>> {
+    fun getAllEquipment(): ResponseEntity<List<Equipment>> {
         val equipment = equipmentService.getAllEquipment()
         return ResponseEntity.ok(equipment)
     }
 
     @GetMapping("/{id}")
-    fun getDepartmentById(
+    fun getEquipmentById(
         @PathVariable id: Long
     ): ResponseEntity<Equipment> {
         val equipment = equipmentService.getEquipmentById(id)
@@ -30,7 +30,7 @@ class EquipmentController(
     }
 
     @PostMapping("/", "")
-    fun saveDepartment(
+    fun saveEquipment(
         @RequestBody equipment: Equipment
     ) {
         equipmentService.saveEquipment(equipment)
