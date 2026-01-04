@@ -25,4 +25,18 @@ interface EquipmentRepository: JpaRepository<Equipment, Long> {
     fun saveEquipment(@Param("eq") equipment: EquipmentModel)
 
     fun getEquipmentByEmployerIdAndStatus(userId: Long, status: String): List<Equipment>
+
+    @Query(
+        value = """
+            UPDATE equipment
+            SET
+                name = :#{#eq?.name},
+                status = :#{#eq?.status},
+                start_date = :#{#eq?.startDate},
+                employer_id = :#{#eq?.employerId}
+            WHERE id = :#{#eq.id}
+        """,
+        nativeQuery = true
+    )
+    fun updateEquipment(@Param("eq") equipment: EquipmentModel)
 }

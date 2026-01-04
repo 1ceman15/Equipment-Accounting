@@ -34,4 +34,22 @@ class EquipmentServiceImpl(
             )
         return equipment
     }
+
+    override fun updateEquipment(equipment: EquipmentModel) {
+        val oldEquipment = equipmentRepository
+            .findById(equipment.id)
+            .orElse(null)
+
+        if (oldEquipment == null) {
+            equipmentRepository.saveEquipment(equipment)
+        }
+
+        val merged = equipment.copy(
+            name = equipment.name ?: oldEquipment.name,
+            status = equipment.status ?: oldEquipment.status,
+            employerId = equipment.employerId ?: oldEquipment.employer.id
+        )
+
+        equipmentRepository.updateEquipment(merged)
+    }
 }
