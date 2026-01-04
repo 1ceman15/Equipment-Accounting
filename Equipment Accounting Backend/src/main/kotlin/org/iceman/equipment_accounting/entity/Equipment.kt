@@ -17,7 +17,7 @@ data class Equipment(
     val name: String,
 
     @Column(name = "status", nullable = false)
-    val status: Int,
+    val status: String,
 
     @Column(name = "start_date")
     val startDate: LocalDate? = null,
