@@ -11,7 +11,9 @@ services:
     ports:
       - "5436:5432"
     volumes:
-      - ea-postgres-data:/var/lib/postgresql/data
+      - ea-postgres:/var/lib/postgresql/data
+    networks:
+      - equipment-accounting
 
   backend:
     build: ./Equipment Accounting Backend
@@ -25,7 +27,35 @@ services:
       JWT_SECRET: secret
     depends_on:
       - db
+      - redis
+    networks:
+      - equipment-accounting
+
+  redis:
+    image: redis:latest
+    container_name: ea_redis
+    ports:
+      - 6379:6379
+    networks:
+      - equipment-accounting
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: book_network-redis_insight
+    ports:
+      - 5540:5540
+    networks:
+      - equipment-accounting
+    volumes:
+      - redis-insight:/data
+    depends_on:
+      - redis
+
+networks:
+  equipment-accounting:
+    driver: bridge
 
 volumes:
-  ea-postgres-data:
+  ea-postgres:
+  redis-insight:
 

@@ -11,6 +11,4 @@ interface EquipmentService {
     fun getAllEquipment(): List<Equipment>
 
     fun getEquipmentByEmployerIdAndStatus(equipment: EquipmentModel): List<Equipment>
-
-    fun updateEquipment(equipment: EquipmentModel)
 }

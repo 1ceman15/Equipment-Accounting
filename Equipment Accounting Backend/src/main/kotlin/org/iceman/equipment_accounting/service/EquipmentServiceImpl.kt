@@ -1,18 +1,19 @@
 package org.iceman.equipment_accounting.service
 
+import org.iceman.equipment_accounting.entity.Employer
 import org.iceman.equipment_accounting.entity.Equipment
 import org.iceman.equipment_accounting.model.Equipment as EquipmentModel
 import org.iceman.equipment_accounting.repository.EquipmentRepository
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class EquipmentServiceImpl(
     private val equipmentRepository: EquipmentRepository
 ) : EquipmentService {
-    override fun saveEquipment(equipment: EquipmentModel) {
-        equipmentRepository.saveEquipment(equipment)
-    }
-
+    @Cacheable(cacheNames = ["equipment"], key = "#id")
     override fun getEquipmentById(id: Long): Equipment? {
         val equipment = equipmentRepository.findById(id).orElse(null)
         return equipment
@@ -35,21 +36,34 @@ class EquipmentServiceImpl(
         return equipment
     }
 
-    override fun updateEquipment(equipment: EquipmentModel) {
+    @Transactional
+    @CachePut(cacheNames = ["equipment"], key = "#id")
+    override fun saveEquipment(equipment: EquipmentModel) {
         val oldEquipment = equipmentRepository
             .findById(equipment.id)
             .orElse(null)
 
         if (oldEquipment == null) {
-            equipmentRepository.saveEquipment(equipment)
+            equipmentRepository.save(equipment.toEntity())
+            return
         }
 
         val merged = equipment.copy(
             name = equipment.name ?: oldEquipment.name,
             status = equipment.status ?: oldEquipment.status,
-            employerId = equipment.employerId ?: oldEquipment.employer.id
+            employerId = equipment.employerId ?: oldEquipment.employer?.id
         )
 
-        equipmentRepository.updateEquipment(merged)
+        equipmentRepository.save(merged.toEntity())
+    }
+
+    private fun EquipmentModel.toEntity(): Equipment {
+        return Equipment(
+            id = id,
+            name = name,
+            status = status,
+            startDate = startDate,
+            Employer(id = employerId)
+        )
     }
 }

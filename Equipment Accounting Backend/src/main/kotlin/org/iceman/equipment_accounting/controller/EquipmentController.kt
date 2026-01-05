@@ -1,6 +1,7 @@
 package org.iceman.equipment_accounting.controller
 
 import org.iceman.equipment_accounting.entity.Equipment
+import org.iceman.equipment_accounting.model.Equipment as EquipmentModel
 import org.iceman.equipment_accounting.service.EquipmentService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -31,7 +32,7 @@ class EquipmentController(
 
     @PostMapping("/", "")
     fun saveEquipment(
-        @RequestBody equipment: Equipment
+        @RequestBody equipment: EquipmentModel
     ) {
         equipmentService.saveEquipment(equipment)
     }

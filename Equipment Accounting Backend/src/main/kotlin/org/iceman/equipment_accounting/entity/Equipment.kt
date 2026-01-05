@@ -7,17 +7,16 @@ import java.time.LocalDate
 @Entity
 @Table(name = "equipment")
 data class Equipment(
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     val id: Long,
 
     @Column(name = "name", nullable = false, length = 250)
-    val name: String,
+    val name: String?,
 
     @Column(name = "status", nullable = false)
-    val status: String,
+    val status: String?,
 
     @Column(name = "start_date")
     val startDate: LocalDate? = null,
@@ -28,6 +27,5 @@ data class Equipment(
         nullable = false,
         foreignKey = ForeignKey(name = "fk_employer_id")
     )
-    val employer: Employer,
-
+    val employer: Employer? = null,
 ) : Serializable
