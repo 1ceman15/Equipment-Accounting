@@ -28,6 +28,7 @@ services:
     depends_on:
       - db
       - redis
+      - keycloak
     networks:
       - equipment-accounting
 
@@ -50,6 +51,26 @@ services:
       - redis-insight:/data
     depends_on:
       - redis
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.4
+    container_name: ea-keycloak
+    ports:
+      - "8082:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/ea_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: password
+    volumes:
+      - ./config/keycloak/import:/opt/keycloak/data/import
+    command:
+      - start-dev
+      - --import-realm
+    networks:
+      - equipment-accounting
 
 networks:
   equipment-accounting:

@@ -1,13 +1,16 @@
 spring:
   application:
     name: Equipment Accounting Backend
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/equipment_accounting
   datasource:
     url: jdbc:postgresql://db:5432/ea_db
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: none
@@ -15,12 +18,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+      hibernate.default_schema: backend
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
       host: localhost
       port: 6379
-
   liquibase:
-    change-log: classpath:db/changelog/master.xml
+    change-log: classpath:db/changelog/changelog.xml
     enabled: true
