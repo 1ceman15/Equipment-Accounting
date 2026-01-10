@@ -32,19 +32,30 @@ services:
     networks:
       - equipment-accounting
 
+  frontend:
+    build: ./Equipment Accounting Frontend
+    container_name: ea-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - keycloak
+    networks:
+      - equipment-accounting
+
   redis:
     image: redis:latest
     container_name: ea_redis
     ports:
-      - 6379:6379
+      - "6379:6379"
     networks:
       - equipment-accounting
 
   redis-insight:
     image: redis/redisinsight:latest
-    container_name: book_network-redis_insight
+    container_name: ea-redis_insight
     ports:
-      - 5540:5540
+      - "5540:5540"
     networks:
       - equipment-accounting
     volumes:
@@ -64,6 +75,10 @@ services:
       KC_DB_URL: jdbc:postgresql://db:5432/ea_db
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: password
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8082
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
     volumes:
       - ./config/keycloak/import:/opt/keycloak/data/import
     command:

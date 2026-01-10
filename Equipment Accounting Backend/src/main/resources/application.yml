@@ -5,7 +5,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8080/realms/equipment_accounting
+          issuer-uri: http://localhost:8082/realms/equipment_accounting
+          jwk-set-uri: http://keycloak:8080/realms/equipment_accounting/protocol/openid-connect/certs
   datasource:
     url: jdbc:postgresql://db:5432/ea_db
     username: postgres
@@ -27,3 +28,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog.xml
     enabled: true
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
