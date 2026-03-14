@@ -28,6 +28,7 @@ class SecurityBeans {
                 auth.anyRequest().denyAll()
             }
             .csrf { it.disable() }
+            .cors { cors -> cors.configurationSource(corsConfigurationSource()) }
             .oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
             .sessionManagement { session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

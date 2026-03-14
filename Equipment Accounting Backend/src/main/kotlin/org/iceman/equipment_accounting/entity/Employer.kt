@@ -1,5 +1,7 @@
 package org.iceman.equipment_accounting.entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import java.io.Serializable
 
@@ -26,12 +28,14 @@ data class Employer(
         nullable = false,
         foreignKey = ForeignKey(name = "fk_department_id")
     )
+    @JsonBackReference
     val department: Department? = null,
 
     @OneToMany(
         mappedBy = "employer",
         fetch = FetchType.LAZY
     )
+    @JsonManagedReference
     val equipments: List<Equipment> = listOf()
 ) : Serializable
 

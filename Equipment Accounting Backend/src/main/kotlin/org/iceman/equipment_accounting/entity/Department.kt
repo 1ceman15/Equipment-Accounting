@@ -1,5 +1,6 @@
 package org.iceman.equipment_accounting.entity
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import java.io.Serializable
 
@@ -19,5 +20,6 @@ data class Department(
         mappedBy = "department",
         fetch = FetchType.LAZY
     )
+    @JsonManagedReference
     val employers: List<Employer>
 ) : Serializable

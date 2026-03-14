@@ -1,5 +1,6 @@
 package org.iceman.equipment_accounting.entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
 import java.io.Serializable
 import java.time.LocalDate
@@ -27,5 +28,6 @@ data class Equipment(
         nullable = false,
         foreignKey = ForeignKey(name = "fk_employer_id")
     )
+    @JsonBackReference
     val employer: Employer? = null,
 ) : Serializable
