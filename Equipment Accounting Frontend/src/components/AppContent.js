@@ -1,76 +1,75 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { ToastContainer, toast } from 'react-toastify';
-import { callApi } from '../helpers/axios_helper';
-import { getUser, login, logout } from '../helpers/auth_helper';
+import { ToastContainer } from "react-toastify";
+import { getUser, login, logout } from "../helpers/auth_helper";
 
-import AuthContent from './AuthContent';
-import Buttons from './Buttons';
+import EquipmentContent from "./EquipmentContent";
+import EmployersContent from "./EmployersContent";
+import DepartmentsContent from "./DepartmentsContent";
 
 export default class AppContent extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { user: {}, api: "" };
+
+        this.state = {
+            user: null
+        };
+
         this.shouldCancel = false;
     }
 
     componentDidMount() {
-        this.getUser();
+        this.loadUser();
     }
-
-    login = () => {
-        login();
-    };
-
-    callApi = () => {
-        callApi()
-            .then(response => {
-                this.setState({ api: response.data });
-                toast.success('Api return successfully data, check in section - Api response');
-            })
-            .catch(error => {
-                toast.error(error);
-            });
-    };
 
     componentWillUnmount() {
         this.shouldCancel = true;
     }
 
-    logout = () => {
-        logout();
-    };
+    loadUser = () => {
 
-    getUser = () => {
         getUser().then(user => {
-            console.log(user)
-            if (user) {
-                toast.success('User has been successfully loaded from store.');
-            } else {
-                toast.info('You are not logged in.');
-            }
 
             if (!this.shouldCancel) {
                 this.setState({ user });
             }
+
         });
+
     };
 
-  render() {
-    return (
-      <>
-        <ToastContainer />
+    renderContent = () => {
 
-        <Buttons
-          login={this.login}
-          logout={this.logout}
-          getUser={this.getUser}
-          callApi={this.callApi}
-        />
+        if (!this.state.user) {
+            return <p>Please login</p>;
+        }
 
-        {this.state.api && <AuthContent data={this.state.api} user={this.state.user} />}
-      </>
-    );
-  }
+        switch (this.props.page) {
+
+            case "equipment":
+                return <EquipmentContent />;
+
+            case "employers":
+                return <EmployersContent />;
+
+            case "departments":
+                return <DepartmentsContent />;
+
+            default:
+                return null;
+        }
+
+    };
+
+    render() {
+
+        return (
+            <>
+                <ToastContainer />
+
+                {this.renderContent()}
+            </>
+        );
+    }
 }

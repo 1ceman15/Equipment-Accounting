@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="insert-demo-data-sql" author="Muhammed">
+        <sql>
+            -- Departments
+            INSERT INTO backend.department (id, name) VALUES (1, 'IT');
+            INSERT INTO backend.department (id, name) VALUES (2, 'HR');
+            INSERT INTO backend.department (id, name) VALUES (3, 'Finance');
+            INSERT INTO backend.department (id, name) VALUES (4, 'Marketing');
+            INSERT INTO backend.department (id, name) VALUES (5, 'Support');
+
+            -- Employers
+            INSERT INTO backend.employer (id, department_id, name, last_name, age) VALUES
+            (1, 1, 'John', 'Doe', 30),
+            (2, 1, 'Anna', 'Smith', 28),
+            (3, 1, 'Michael', 'Johnson', 35),
+            (4, 2, 'Emily', 'Davis', 31),
+            (5, 2, 'Daniel', 'Wilson', 45),
+            (6, 3, 'Sophia', 'Taylor', 29),
+            (7, 3, 'James', 'Anderson', 50),
+            (8, 4, 'Olivia', 'Martin', 26),
+            (9, 4, 'William', 'Garcia', 38),
+            (10, 5, 'Emma', 'Martinez', 33);
+
+            -- Equipment
+            INSERT INTO backend.equipment (id, name, employer_id, status, start_date) VALUES
+            (1, 'Dell XPS 13', 1, 'IN_USE', '2023-01-10'),
+            (2, 'MacBook Pro 16', 2, 'IN_USE', '2023-03-15'),
+            (3, 'Lenovo ThinkPad X1', 3, 'IN_USE', '2023-05-12'),
+            (4, 'HP EliteBook', 4, 'IN_USE', '2023-06-01'),
+            (5, 'Samsung Monitor 27', 5, 'IN_USE', '2023-07-20'),
+            (6, 'Logitech Keyboard', NULL, 'AVAILABLE', NULL),
+            (7, 'HP LaserJet Printer', NULL, 'AVAILABLE', NULL),
+            (8, 'iPad Pro', 8, 'IN_USE', '2024-02-01'),
+            (9, 'Surface Laptop', 9, 'IN_USE', '2024-03-10'),
+            (10, 'Cisco Router', NULL, 'AVAILABLE', NULL);
+        </sql>
+
+        <rollback>
+            <sql>
+                DELETE FROM backend.equipment;
+                DELETE FROM backend.employer;
+                DELETE FROM backend.department;
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -22,12 +22,12 @@
         .then(function(user) {
             console.log('Signin successful:', user);
             // Задержка 2 секунды перед редиректом (как Thread.sleep(2000) в Java)
-            setTimeout(() => window.location = "/", 20000);
+            window.location = "/";
         })
         .catch(function(error) {
             console.error('Error during signin callback:', error);
             // Задержка 2 секунды перед редиректом даже при ошибке
-            setTimeout(() => window.location = "/", 20000);
+            window.location = "/";
         });
 </script>
 </body>

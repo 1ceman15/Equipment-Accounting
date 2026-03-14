@@ -1,21 +1,74 @@
-import * as React from 'react';
-import AppContent from '../components/AppContent';
-import Header from '../components/Header';
-import logo from '../logo.svg';
-import './App.css';
+import * as React from "react";
+import AppContent from "../components/AppContent";
+import Header from "../components/Header";
+import logo from "../logo.svg";
+import "./App.css";
 
 class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      page: "equipment"
+    };
+  }
+
+  setPage = (page) => {
+    this.setState({ page });
+  };
+
   render() {
+
     return (
-      <div className="App">
-        <Header pageTitle="Frontend client connected to Keycloak" logoSrc={logo} />
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col">
-              <AppContent />
-            </div>
+      <div className="app-container">
+
+        <Header
+          logoSrc={logo}
+          login={this.props.login}
+          logout={this.props.logout}
+          user={this.props.user}
+        />
+
+        <div className="main-layout">
+
+          <div className="sidebar">
+
+            <ul className="menu-list">
+
+              <li
+                className="menu-item"
+                onClick={() => this.setPage("equipment")}
+              >
+                Equipment
+              </li>
+
+              <li
+                className="menu-item"
+                onClick={() => this.setPage("employers")}
+              >
+                Employers
+              </li>
+
+              <li
+                className="menu-item"
+                onClick={() => this.setPage("departments")}
+              >
+                Departments
+              </li>
+
+            </ul>
+
           </div>
+
+          <div className="content">
+
+            <AppContent page={this.state.page} />
+
+          </div>
+
         </div>
+
       </div>
     );
   }

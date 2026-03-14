@@ -1,60 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="create-tables" author="Muhammed">
+    <changeSet id="create-tables-sql" author="Muhammed">
+        <!-- Создание таблиц через SQL -->
+        <sql>
+            CREATE TABLE IF NOT EXISTS backend.department (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(150) NOT NULL
+            );
 
-        <createTable tableName="department">
-            <column name="id" type="int4">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(150)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
+            CREATE TABLE IF NOT EXISTS backend.employer (
+            id SERIAL PRIMARY KEY,
+            department_id INT NOT NULL REFERENCES backend.department(id),
+            name VARCHAR(100) NOT NULL,
+            last_name VARCHAR(100) NOT NULL,
+            age INT NOT NULL
+            );
 
-        <createTable tableName="employer">
-            <column name="id" type="int4">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="department_id" type="int4">
-                <constraints foreignKeyName="fk_department_id" references="department(id)" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_name" type="varchar(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="age" type="int4">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <createTable tableName="equipment">
-            <column name="id" type="int4">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(250)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="employer_id" type="int4">
-                <constraints foreignKeyName="fk_employer_id" references="employer(id)" nullable="true"/>
-            </column>
-            <column name="status" type="varchar(250)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="start_date" type="date">
-                <constraints nullable="true"/>
-            </column>
-        </createTable>
+            CREATE TABLE IF NOT EXISTS backend.equipment (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(250) NOT NULL,
+            employer_id INT REFERENCES backend.employer(id),
+            status VARCHAR(250) NOT NULL,
+            start_date DATE
+            );
+        </sql>
 
         <rollback>
-            <dropTable tableName="equipment"/>
-            <dropTable tableName="employer"/>
-            <dropTable tableName="department"/>
+            <sql>
+                DROP TABLE IF EXISTS backend.equipment CASCADE;
+                DROP TABLE IF EXISTS backend.employer CASCADE;
+                DROP TABLE IF EXISTS backend.department CASCADE;
+            </sql>
         </rollback>
     </changeSet>
 </databaseChangeLog>
