@@ -39,22 +39,7 @@ class EquipmentServiceImpl(
     @Transactional
     @CachePut(cacheNames = ["equipment"], key = "#id")
     override fun saveEquipment(equipment: EquipmentModel) {
-        val oldEquipment = equipmentRepository
-            .findById(equipment.id)
-            .orElse(null)
-
-        if (oldEquipment == null) {
-            equipmentRepository.save(equipment.toEntity())
-            return
-        }
-
-        val merged = equipment.copy(
-            name = equipment.name ?: oldEquipment.name,
-            status = equipment.status ?: oldEquipment.status,
-            employerId = equipment.employerId ?: oldEquipment.employer?.id
-        )
-
-        equipmentRepository.save(merged.toEntity())
+        equipmentRepository.save(equipment.toEntity())
     }
 
     private fun EquipmentModel.toEntity(): Equipment {

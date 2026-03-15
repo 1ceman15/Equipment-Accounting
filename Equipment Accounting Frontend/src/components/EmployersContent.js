@@ -10,7 +10,7 @@ export default class EmployersContent extends React.Component {
 
     this.state = {
       employers: [],
-      departments: [],            // список отделов для выпадающего списка и маппинга
+      departments: [],            // список отделов для выпадающего списка
       showModal: false,
       newEmployer: {
         name: '',
@@ -32,6 +32,7 @@ export default class EmployersContent extends React.Component {
   loadEmployers = () => {
     getAllEmployers()
       .then(response => {
+        console.log("Employers loaded:", response.data);
         this.setState({ employers: response.data });
       })
       .catch(error => {
@@ -44,6 +45,7 @@ export default class EmployersContent extends React.Component {
     this.setState({ departmentsLoading: true });
     getAllDepartments()
       .then(response => {
+        console.log("Departments loaded:", response.data);
         this.setState({ departments: response.data });
       })
       .catch(error => {
@@ -87,11 +89,13 @@ export default class EmployersContent extends React.Component {
 
     this.setState({ loading: true, error: null });
 
+    // Формируем данные в соответствии с ожидаемой структурой на бэкенде:
+    // поле department должно быть объектом с id
     const employerData = {
       name: newEmployer.name,
       lastName: newEmployer.lastName,
       age: parseInt(newEmployer.age, 10),
-      departmentId: parseInt(newEmployer.departmentId, 10)
+      department: { id: parseInt(newEmployer.departmentId, 10) }
     };
 
     createEmployer(employerData)
@@ -106,13 +110,6 @@ export default class EmployersContent extends React.Component {
       .finally(() => {
         this.setState({ loading: false });
       });
-  };
-
-  // Функция для получения названия отдела по его ID
-  getDepartmentName = (departmentId) => {
-    if (!departmentId) return '-';
-    const dept = this.state.departments.find(d => d.id === departmentId);
-    return dept ? dept.name : departmentId; // если отдел не найден, показываем ID
   };
 
   render() {
@@ -147,7 +144,6 @@ export default class EmployersContent extends React.Component {
                   <td>{emp.name}</td>
                   <td>{emp.lastName}</td>
                   <td>{emp.age}</td>
-                  <td>{this.getDepartmentName(emp.departmentId)}</td>
                 </tr>
               ))
             )}
