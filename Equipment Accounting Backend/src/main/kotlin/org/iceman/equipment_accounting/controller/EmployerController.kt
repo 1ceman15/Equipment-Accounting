@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.iceman.equipment_accounting.model.Employer as EmployerModel
 
 @RestController
 @RequestMapping("/api/v1/employers")
@@ -16,13 +17,13 @@ class EmployerController(
     private val employerService: EmployerService
 ) {
     @GetMapping("/", "")
-    fun getAllDepartments(): ResponseEntity<List<Employer>> {
+    fun getAllEmployers(): ResponseEntity<List<Employer>> {
         val employers = employerService.getAllEmployers()
         return ResponseEntity.ok(employers)
     }
 
     @GetMapping("/{id}")
-    fun getDepartmentById(
+    fun getEmployerById(
         @PathVariable id: Long
     ): ResponseEntity<Employer> {
         val employer = employerService.getEmployerById(id)
@@ -30,8 +31,8 @@ class EmployerController(
     }
 
     @PostMapping("/", "")
-    fun saveDepartment(
-        @RequestBody employer: Employer
+    fun saveEmployer(
+        @RequestBody employer: EmployerModel
     ) {
         employerService.saveEmployer(employer)
     }

@@ -1,18 +1,33 @@
 package org.iceman.equipment_accounting.service
 
+import jakarta.transaction.Transactional
 import org.iceman.equipment_accounting.entity.Employer
+import org.iceman.equipment_accounting.repository.DepartmentRepository
 import org.iceman.equipment_accounting.repository.EmployerRepository
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
+import org.iceman.equipment_accounting.model.Employer as EmployerModel
 
 @Service
 class EmployerServiceImpl(
-    private val employerRepository: EmployerRepository
+    private val employerRepository: EmployerRepository,
+    private val departmentRepository: DepartmentRepository
 ): EmployerService {
     @CachePut(cacheNames = ["employer"], key = "#id")
-    override fun saveEmployer(employer: Employer) {
-        employerRepository.save(employer)
+    @Transactional
+    override fun saveEmployer(employer: EmployerModel) {
+        val department = departmentRepository.findById(employer.departmentId)
+            .orElse(null)
+
+        val entity = Employer(
+            id = null,
+            name = employer.name,
+            lastName = employer.lastName,
+            age = employer.age,
+            department = department
+        )
+        employerRepository.save(entity)
     }
 
     @Cacheable(cacheNames = ["employer"], key = "#id")
