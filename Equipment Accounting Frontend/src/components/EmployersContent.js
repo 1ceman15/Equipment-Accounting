@@ -1,5 +1,6 @@
 import React from "react";
 import { getAllEmployers, createEmployer } from "../helpers/employer_helper";
+import { getAllDepartments } from "../helpers/department_helper";
 import "./EmployersContent.css";
 
 export default class EmployersContent extends React.Component {
@@ -9,31 +10,48 @@ export default class EmployersContent extends React.Component {
 
     this.state = {
       employers: [],
+      departments: [],            // список отделов для выпадающего списка и маппинга
       showModal: false,
       newEmployer: {
         name: '',
         lastName: '',
         age: '',
-        departmentId: ''          // добавляем поле для ID отдела
+        departmentId: ''
       },
       loading: false,
-      error: null
+      error: null,
+      departmentsLoading: false
     };
   }
 
   componentDidMount() {
     this.loadEmployers();
+    this.loadDepartments();
   }
 
   loadEmployers = () => {
     getAllEmployers()
       .then(response => {
-        // предполагаем, что response.data – массив сотрудников
         this.setState({ employers: response.data });
       })
       .catch(error => {
         console.error("loadEmployers error:", error);
         this.setState({ error: "Ошибка загрузки сотрудников" });
+      });
+  };
+
+  loadDepartments = () => {
+    this.setState({ departmentsLoading: true });
+    getAllDepartments()
+      .then(response => {
+        this.setState({ departments: response.data });
+      })
+      .catch(error => {
+        console.error("loadDepartments error:", error);
+        this.setState({ error: "Ошибка загрузки отделов" });
+      })
+      .finally(() => {
+        this.setState({ departmentsLoading: false });
       });
   };
 
@@ -62,7 +80,6 @@ export default class EmployersContent extends React.Component {
     e.preventDefault();
     const { newEmployer } = this.state;
 
-    // Валидация
     if (!newEmployer.name || !newEmployer.lastName || !newEmployer.age || !newEmployer.departmentId) {
       alert("Заполните все поля");
       return;
@@ -70,7 +87,6 @@ export default class EmployersContent extends React.Component {
 
     this.setState({ loading: true, error: null });
 
-    // Преобразуем age и departmentId в числа
     const employerData = {
       name: newEmployer.name,
       lastName: newEmployer.lastName,
@@ -92,8 +108,15 @@ export default class EmployersContent extends React.Component {
       });
   };
 
+  // Функция для получения названия отдела по его ID
+  getDepartmentName = (departmentId) => {
+    if (!departmentId) return '-';
+    const dept = this.state.departments.find(d => d.id === departmentId);
+    return dept ? dept.name : departmentId; // если отдел не найден, показываем ID
+  };
+
   render() {
-    const { employers, showModal, newEmployer, loading, error } = this.state;
+    const { employers, departments, showModal, newEmployer, loading, error, departmentsLoading } = this.state;
 
     return (
       <div>
@@ -111,6 +134,7 @@ export default class EmployersContent extends React.Component {
               <th>Name</th>
               <th>Last name</th>
               <th>Age</th>
+              <th>Department</th>
             </tr>
           </thead>
           <tbody>
@@ -123,6 +147,7 @@ export default class EmployersContent extends React.Component {
                   <td>{emp.name}</td>
                   <td>{emp.lastName}</td>
                   <td>{emp.age}</td>
+                  <td>{this.getDepartmentName(emp.departmentId)}</td>
                 </tr>
               ))
             )}
@@ -171,19 +196,26 @@ export default class EmployersContent extends React.Component {
                   />
                 </div>
                 <div className="form-group">
-                  <label>ID отдела</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="departmentId"
-                    value={newEmployer.departmentId}
-                    onChange={this.handleInputChange}
-                    required
-                    min="1"
-                  />
+                  <label>Отдел</label>
+                  {departmentsLoading ? (
+                    <div>Загрузка отделов...</div>
+                  ) : (
+                    <select
+                      className="form-control"
+                      name="departmentId"
+                      value={newEmployer.departmentId}
+                      onChange={this.handleInputChange}
+                      required
+                    >
+                      <option value="">Выберите отдел</option>
+                      {departments.map(dept => (
+                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
                 <div className="modal-actions">
-                  <button type="submit" className="btn btn-primary" disabled={loading}>
+                  <button type="submit" className="btn btn-primary" disabled={loading || departmentsLoading}>
                     {loading ? "Сохранение..." : "Сохранить"}
                   </button>
                   <button type="button" className="btn btn-secondary" onClick={this.closeModal}>

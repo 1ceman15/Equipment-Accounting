@@ -1,5 +1,6 @@
 import React from "react";
-import { getAllDepartments } from "../helpers/department_helper";
+import { getAllDepartments, createDepartment } from "../helpers/department_helper";
+import "./EmployersContent.css"; // переиспользуем те же стили для модалки
 
 export default class DepartmentsContent extends React.Component {
 
@@ -8,7 +9,12 @@ export default class DepartmentsContent extends React.Component {
 
     this.state = {
       departments: [],
-      loading: true,
+      showModal: false,
+      newDepartment: {
+        name: ''
+      },
+      loading: false,
+      saving: false,
       error: null
     };
   }
@@ -18,6 +24,7 @@ export default class DepartmentsContent extends React.Component {
   }
 
   loadDepartments = () => {
+    this.setState({ loading: true, error: null });
     getAllDepartments()
       .then(response => {
         console.log('DepartmentsContent: response received', response);
@@ -75,21 +82,76 @@ export default class DepartmentsContent extends React.Component {
       });
   };
 
+  // Открыть модальное окно
+  openModal = () => {
+    this.setState({
+      showModal: true,
+      newDepartment: { name: '' },
+      saving: false,
+      error: null
+    });
+  };
+
+  // Закрыть модальное окно
+  closeModal = () => {
+    this.setState({ showModal: false });
+  };
+
+  // Обработка изменений в поле ввода
+  handleInputChange = (e) => {
+    const { name, value } = e.target;
+    this.setState(prev => ({
+      newDepartment: {
+        ...prev.newDepartment,
+        [name]: value
+      }
+    }));
+  };
+
+  // Отправка формы
+  handleSubmit = (e) => {
+    e.preventDefault();
+    const { newDepartment } = this.state;
+
+    if (!newDepartment.name.trim()) {
+      alert("Введите название департамента");
+      return;
+    }
+
+    this.setState({ saving: true, error: null });
+
+    createDepartment({ name: newDepartment.name.trim() })
+      .then(() => {
+        this.closeModal();
+        this.loadDepartments(); // обновляем список
+      })
+      .catch(error => {
+        console.error("createDepartment error:", error);
+        this.setState({ error: "Ошибка при создании департамента" });
+      })
+      .finally(() => {
+        this.setState({ saving: false });
+      });
+  };
+
   render() {
-    const { departments, loading, error } = this.state;
+    const { departments, showModal, newDepartment, loading, saving, error } = this.state;
 
     if (loading) {
       return <div>Загрузка подразделений...</div>;
     }
 
-    if (error) {
-      return <div>Ошибка: {error}</div>;
-    }
-
     return (
       <div>
-        <h2>Departments</h2>
-        {departments.length === 0 && <p>Нет данных</p>}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2>Departments</h2>
+          <button className="btn btn-success" onClick={this.openModal}>+ Добавить</button>
+        </div>
+
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        {departments.length === 0 && !loading && <p>Нет данных</p>}
+
         <table className="table table-striped">
           <thead>
             <tr>
@@ -106,6 +168,37 @@ export default class DepartmentsContent extends React.Component {
             ))}
           </tbody>
         </table>
+
+        {/* Модальное окно добавления департамента */}
+        {showModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>Добавить департамент</h3>
+              <form onSubmit={this.handleSubmit}>
+                <div className="form-group">
+                  <label>Название</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="name"
+                    value={newDepartment.name}
+                    onChange={this.handleInputChange}
+                    required
+                    autoFocus
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button type="submit" className="btn btn-primary" disabled={saving}>
+                    {saving ? "Сохранение..." : "Сохранить"}
+                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={this.closeModal}>
+                    Отмена
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

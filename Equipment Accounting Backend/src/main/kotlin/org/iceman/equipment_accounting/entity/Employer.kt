@@ -22,7 +22,7 @@ data class Employer(
     @Column(name = "age", nullable = false)
     val age: Int? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "department_id",
         nullable = false,

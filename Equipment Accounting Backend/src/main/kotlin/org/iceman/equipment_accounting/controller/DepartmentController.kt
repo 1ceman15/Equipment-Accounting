@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.iceman.equipment_accounting.model.Department as DepartmentModel
+
 
 @RestController
 @RequestMapping("/api/v1/departments")
@@ -31,7 +33,7 @@ class DepartmentController(
     }
 
     @PostMapping("/", "")
-    fun saveDepartment(@RequestBody department: Department) {
+    fun saveDepartment(@RequestBody department: DepartmentModel) {
         departmentService.saveDepartment(department)
     }
 }
