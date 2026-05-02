@@ -1,11 +1,10 @@
 import React from "react";
-import { getAllEquipment, createEquipment } from "../helpers/equipment_helper";
+import { getAllEquipment, createEquipment, updateEquipment } from "../helpers/equipment_helper";
 import { getAllEmployers } from "../helpers/employer_helper";
 import EquipmentTable from "./EquipmentTable";
-import "./EmployersContent.css"; // переиспользуем стили для модалки
+import "./EmployersContent.css";
 
 export default class EquipmentContent extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -13,6 +12,8 @@ export default class EquipmentContent extends React.Component {
       equipment: [],
       employers: [],
       showModal: false,
+      showEditModal: false,
+      editingEquipment: null,
       newEquipment: {
         name: '',
         status: 'AVAILABLE',
@@ -24,6 +25,12 @@ export default class EquipmentContent extends React.Component {
       error: null
     };
   }
+
+  // +++ Вспомогательная функция сортировки оборудования по id (по возрастанию)
+  sortEquipmentById = (equipmentList) => {
+    if (!Array.isArray(equipmentList)) return [];
+    return [...equipmentList].sort((a, b) => (a.id || 0) - (b.id || 0));
+  };
 
   componentDidMount() {
     this.loadEquipment();
@@ -37,21 +44,13 @@ export default class EquipmentContent extends React.Component {
 
         let equipmentData = response.data;
 
-        // Проверка на пагинацию (Spring Page)
         if (equipmentData && equipmentData.content && Array.isArray(equipmentData.content)) {
-          console.log('EquipmentContent: detected paginated response, using content');
           equipmentData = equipmentData.content;
-        }
-        // Если data – сам массив
-        else if (Array.isArray(equipmentData)) {
-          console.log('EquipmentContent: detected array response');
-        }
-        // Если data – другой объект, возможно, содержит поле _embedded? (для Spring Data Rest)
-        else if (equipmentData && equipmentData._embedded && equipmentData._embedded.equipment) {
-          console.log('EquipmentContent: detected _embedded response');
+        } else if (Array.isArray(equipmentData)) {
+          // уже массив
+        } else if (equipmentData && equipmentData._embedded && equipmentData._embedded.equipment) {
           equipmentData = equipmentData._embedded.equipment;
-        }
-        else {
+        } else {
           console.error('EquipmentContent: unexpected response format', equipmentData);
           this.setState({
             equipment: [],
@@ -71,9 +70,12 @@ export default class EquipmentContent extends React.Component {
           return;
         }
 
-        console.log('EquipmentContent: setting equipment data', equipmentData);
+        // +++ Применяем сортировку по id
+        const sortedEquipment = this.sortEquipmentById(equipmentData);
+
+        console.log('EquipmentContent: setting equipment data (sorted by id)', sortedEquipment);
         this.setState({
-          equipment: equipmentData,
+          equipment: sortedEquipment,
           loading: false
         });
       })
@@ -91,11 +93,10 @@ export default class EquipmentContent extends React.Component {
       .then(response => {
         let employersData = response.data;
 
-        // Аналогичная обработка формата ответа
         if (employersData && employersData.content && Array.isArray(employersData.content)) {
           employersData = employersData.content;
         } else if (Array.isArray(employersData)) {
-          // уже массив
+          // already array
         } else if (employersData && employersData._embedded && employersData._embedded.employers) {
           employersData = employersData._embedded.employers;
         } else {
@@ -153,7 +154,6 @@ export default class EquipmentContent extends React.Component {
 
     this.setState({ saving: true, error: null });
 
-    // Формируем данные для отправки на бэкенд
     const equipmentData = {
       name: newEquipment.name.trim(),
       status: newEquipment.status,
@@ -164,7 +164,7 @@ export default class EquipmentContent extends React.Component {
     createEquipment(equipmentData)
       .then(() => {
         this.closeModal();
-        this.loadEquipment(); // обновляем список
+        this.loadEquipment(); // перезагружает и сортирует
       })
       .catch(error => {
         console.error("createEquipment error:", error);
@@ -175,8 +175,74 @@ export default class EquipmentContent extends React.Component {
       });
   };
 
+  // Редактирование
+  openEditModal = (equipment) => {
+    this.setState({
+      showEditModal: true,
+      editingEquipment: {
+        id: equipment.id,
+        name: equipment.name || '',
+        status: equipment.status || 'AVAILABLE',
+        startDate: equipment.startDate || '',
+        employerId: equipment.employer ? equipment.employer.id : ''
+      },
+      saving: false,
+      error: null
+    });
+  };
+
+  closeEditModal = () => {
+    this.setState({ showEditModal: false, editingEquipment: null });
+  };
+
+  handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    this.setState(prev => ({
+      editingEquipment: {
+        ...prev.editingEquipment,
+        [name]: value
+      }
+    }));
+  };
+
+  handleEditSubmit = (e) => {
+    e.preventDefault();
+    const { editingEquipment } = this.state;
+
+    if (!editingEquipment.name.trim()) {
+      alert("Введите название оборудования");
+      return;
+    }
+    if (!editingEquipment.status) {
+      alert("Выберите статус");
+      return;
+    }
+
+    this.setState({ saving: true, error: null });
+
+    const equipmentData = {
+      name: editingEquipment.name.trim(),
+      status: editingEquipment.status,
+      startDate: editingEquipment.startDate || null,
+      employerId: editingEquipment.employerId ? parseInt(editingEquipment.employerId, 10) : null
+    };
+
+    updateEquipment(editingEquipment.id, equipmentData)
+      .then(() => {
+        this.closeEditModal();
+        this.loadEquipment(); // перезагружает и сортирует
+      })
+      .catch(error => {
+        console.error("updateEquipment error:", error);
+        this.setState({ error: "Ошибка при обновлении оборудования" });
+      })
+      .finally(() => {
+        this.setState({ saving: false });
+      });
+  };
+
   render() {
-    const { equipment, employers, showModal, newEquipment, loading, saving, error } = this.state;
+    const { equipment, employers, showModal, showEditModal, editingEquipment, newEquipment, loading, saving, error } = this.state;
 
     if (loading) {
       return <div>Загрузка оборудования...</div>;
@@ -191,7 +257,7 @@ export default class EquipmentContent extends React.Component {
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-        <EquipmentTable equipment={equipment} />
+        <EquipmentTable equipment={equipment} onEdit={this.openEditModal} />
 
         {/* Модальное окно добавления оборудования */}
         {showModal && (
@@ -260,6 +326,81 @@ export default class EquipmentContent extends React.Component {
                     {saving ? "Сохранение..." : "Сохранить"}
                   </button>
                   <button type="button" className="btn btn-secondary" onClick={this.closeModal}>
+                    Отмена
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Модальное окно редактирования оборудования */}
+        {showEditModal && editingEquipment && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>Редактировать оборудование</h3>
+              <form onSubmit={this.handleEditSubmit}>
+                <div className="form-group">
+                  <label>Название</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="name"
+                    value={editingEquipment.name}
+                    onChange={this.handleEditInputChange}
+                    required
+                    autoFocus
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Статус</label>
+                  <select
+                    className="form-control"
+                    name="status"
+                    value={editingEquipment.status}
+                    onChange={this.handleEditInputChange}
+                    required
+                  >
+                    <option value="AVAILABLE">Свободен</option>
+                    <option value="IN_USE">Используется</option>
+                    <option value="REPAIR">В ремонте</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Дата начала использования</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="startDate"
+                    value={editingEquipment.startDate}
+                    onChange={this.handleEditInputChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Сотрудник</label>
+                  <select
+                    className="form-control"
+                    name="employerId"
+                    value={editingEquipment.employerId}
+                    onChange={this.handleEditInputChange}
+                  >
+                    <option value="">Не назначен</option>
+                    {employers.map(emp => (
+                      <option key={emp.id} value={emp.id}>
+                        {emp.name} {emp.lastName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="modal-actions">
+                  <button type="submit" className="btn btn-primary" disabled={saving}>
+                    {saving ? "Сохранение..." : "Сохранить изменения"}
+                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={this.closeEditModal}>
                     Отмена
                   </button>
                 </div>

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -35,5 +36,14 @@ class EquipmentController(
         @RequestBody equipment: EquipmentModel
     ) {
         equipmentService.saveEquipment(equipment)
+    }
+
+    @PutMapping("/{id}")
+    fun updateEquipment(
+        @PathVariable id: Long,
+        @RequestBody equipment: EquipmentModel
+    ): ResponseEntity<Equipment> {
+        val updated = equipmentService.updateEquipment(id, equipment)
+        return ResponseEntity.ok(updated)
     }
 }

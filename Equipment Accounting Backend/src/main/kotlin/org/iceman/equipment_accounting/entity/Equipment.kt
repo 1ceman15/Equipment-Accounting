@@ -14,20 +14,16 @@ data class Equipment(
     val id: Long? = null,
 
     @Column(name = "name", nullable = false, length = 250)
-    val name: String?,
+    var name: String? = null,
 
     @Column(name = "status", nullable = false)
-    val status: String?,
+    var status: String? = null,
 
     @Column(name = "start_date")
-    val startDate: LocalDate? = null,
+    var startDate: LocalDate? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "employer_id",
-        nullable = false,
-        foreignKey = ForeignKey(name = "fk_employer_id")
-    )
+    @JoinColumn(name = "employer_id", nullable = false)
     @JsonBackReference
-    val employer: Employer? = null,
+    var employer: Employer? = null,
 ) : Serializable

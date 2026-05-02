@@ -42,6 +42,25 @@ class EquipmentServiceImpl(
         equipmentRepository.save(equipment.toEntity())
     }
 
+    @Transactional
+    @CachePut(cacheNames = ["equipment"], key = "#id")
+    override fun updateEquipment(
+        id: Long,
+        equipmentModel: EquipmentModel
+    ): Equipment {
+        val existing = equipmentRepository.findById(id)
+            .orElseThrow { IllegalArgumentException("Оборудование с id $id не найдено") }
+
+        equipmentModel.name?.let { existing.name = it }
+        equipmentModel.status?.let { existing.status = it }
+        equipmentModel.startDate?.let { existing.startDate = it }
+        equipmentModel.employerId?.let { employerId ->
+            existing.employer = Employer(id = employerId)
+        }
+
+        return equipmentRepository.save(existing)
+    }
+
     private fun EquipmentModel.toEntity(): Equipment {
         return Equipment(
             id = id,

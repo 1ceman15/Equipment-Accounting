@@ -46,3 +46,16 @@ export const createEquipment = async (equipment) => {
     throw error;
   }
 };
+
+export const updateEquipment = async (id, equipment) => {
+  console.log(`updateEquipment: called for id ${id}`, equipment);
+  try {
+    const headers = await getHeaders();
+    const response = await axios.put(`${API_URL}/${id}`, equipment, { headers });
+    console.log("updateEquipment: success", response);
+    return response;
+  } catch (error) {
+    console.error("updateEquipment: error", error);
+    throw error;
+  }
+};
