@@ -144,7 +144,7 @@ export default class DepartmentsContent extends React.Component {
     return (
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Departments</h2>
+          <h2>Департаменты</h2>
           <button className="btn btn-success" onClick={this.openModal}>+ Добавить</button>
         </div>
 
@@ -156,7 +156,7 @@ export default class DepartmentsContent extends React.Component {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
+              <th>Название</th>
             </tr>
           </thead>
           <tbody>

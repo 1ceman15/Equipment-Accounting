@@ -6,11 +6,11 @@ import org.iceman.equipment_accounting.entity.Equipment
 interface EquipmentService {
     fun saveEquipment(equipment: EquipmentModel)
 
-    fun getEquipmentById(id: Long): Equipment?
+    fun getEquipmentById(id: Long): EquipmentModel?
 
-    fun getAllEquipment(): List<Equipment>
+    fun getAllEquipment(): List<EquipmentModel>
 
-    fun getEquipmentByEmployerIdAndStatus(equipment: EquipmentModel): List<Equipment>
+    fun getEquipmentByEmployerIdAndStatus(equipment: EquipmentModel): List<EquipmentModel>
 
-    fun updateEquipment(id: Long, equipment: EquipmentModel): Equipment
+    fun updateEquipment(id: Long, equipment: EquipmentModel): EquipmentModel
 }

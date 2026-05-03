@@ -14,17 +14,17 @@ class EquipmentServiceImpl(
     private val equipmentRepository: EquipmentRepository
 ) : EquipmentService {
     @Cacheable(cacheNames = ["equipment"], key = "#id")
-    override fun getEquipmentById(id: Long): Equipment? {
+    override fun getEquipmentById(id: Long): EquipmentModel? {
         val equipment = equipmentRepository.findById(id).orElse(null)
-        return equipment
+        return equipment.toModel()
     }
 
-    override fun getAllEquipment(): List<Equipment> {
+    override fun getAllEquipment(): List<EquipmentModel> {
         val equipment = equipmentRepository.findAll()
-        return equipment
+        return equipment.map { it.toModel() }
     }
 
-    override fun getEquipmentByEmployerIdAndStatus(equipment: EquipmentModel): List<Equipment> {
+    override fun getEquipmentByEmployerIdAndStatus(equipment: EquipmentModel): List<EquipmentModel> {
         if (equipment.employerId == null || equipment.status == null) {
             throw IllegalArgumentException("employerId and status does not present")
         }
@@ -33,7 +33,7 @@ class EquipmentServiceImpl(
             equipment.employerId,
                 equipment.status
             )
-        return equipment
+        return equipment.map { it.toModel() }
     }
 
     @Transactional
@@ -47,7 +47,7 @@ class EquipmentServiceImpl(
     override fun updateEquipment(
         id: Long,
         equipmentModel: EquipmentModel
-    ): Equipment {
+    ): EquipmentModel {
         val existing = equipmentRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Оборудование с id $id не найдено") }
 
@@ -58,7 +58,8 @@ class EquipmentServiceImpl(
             existing.employer = Employer(id = employerId)
         }
 
-        return equipmentRepository.save(existing)
+        val equipment = equipmentRepository.save(existing)
+        return equipment.toModel()
     }
 
     private fun EquipmentModel.toEntity(): Equipment {
@@ -68,6 +69,15 @@ class EquipmentServiceImpl(
             status = status,
             startDate = startDate,
             Employer(id = employerId)
+        )
+    }
+    private fun Equipment.toModel(): EquipmentModel {
+        return EquipmentModel(
+            id = id,
+            name = name,
+            status = status,
+            startDate = startDate,
+            employerId = employer?.id
         )
     }
 }

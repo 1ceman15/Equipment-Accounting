@@ -19,9 +19,9 @@ export default class Header extends React.Component {
   loadUser = () => {
     getUser().then(user => {
       if (user) {
-        toast.success("User successfully loaded from store.");
+        toast.success("Авторизация прошла успешно.");
       } else {
-        toast.info("You are not logged in.");
+        toast.info("Вы не вошли.");
       }
       this.setState({ user });
       if (this.props.onUserChange) {
@@ -55,13 +55,13 @@ export default class Header extends React.Component {
 
           {!this.state.user && (
             <button className="btn btn-primary" onClick={this.handleLogin}>
-              Login
+              Войти
             </button>
           )}
 
           {this.state.user && (
             <button className="btn btn-dark" onClick={this.handleLogout}>
-              Logout
+              Выйти
             </button>
           )}
 

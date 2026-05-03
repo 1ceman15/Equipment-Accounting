@@ -36,8 +36,18 @@ class EmployerServiceImpl(
         return employer
     }
 
-    override fun getAllEmployers(): List<Employer> {
+    override fun getAllEmployers(): List<EmployerModel> {
         val employers = employerRepository.findAll()
-        return employers
+        return employers.map { it.toModel() }
+    }
+
+    private fun Employer.toModel(): EmployerModel {
+        return EmployerModel(
+            id = this.id,
+            name = this.name,
+            lastName = this.lastName,
+            age = this.age,
+            departmentId = this.department?.id
+        )
     }
 }

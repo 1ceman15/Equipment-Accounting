@@ -26,7 +26,7 @@ export default class EquipmentContent extends React.Component {
     };
   }
 
-  // +++ Вспомогательная функция сортировки оборудования по id (по возрастанию)
+  // Сортировка по id (по возрастанию)
   sortEquipmentById = (equipmentList) => {
     if (!Array.isArray(equipmentList)) return [];
     return [...equipmentList].sort((a, b) => (a.id || 0) - (b.id || 0));
@@ -40,8 +40,6 @@ export default class EquipmentContent extends React.Component {
   loadEquipment = () => {
     getAllEquipment()
       .then(response => {
-        console.log('EquipmentContent: response received', response);
-
         let equipmentData = response.data;
 
         if (equipmentData && equipmentData.content && Array.isArray(equipmentData.content)) {
@@ -51,7 +49,6 @@ export default class EquipmentContent extends React.Component {
         } else if (equipmentData && equipmentData._embedded && equipmentData._embedded.equipment) {
           equipmentData = equipmentData._embedded.equipment;
         } else {
-          console.error('EquipmentContent: unexpected response format', equipmentData);
           this.setState({
             equipment: [],
             loading: false,
@@ -61,7 +58,6 @@ export default class EquipmentContent extends React.Component {
         }
 
         if (!Array.isArray(equipmentData)) {
-          console.error('EquipmentContent: after extraction, data is not an array', equipmentData);
           this.setState({
             equipment: [],
             loading: false,
@@ -70,10 +66,7 @@ export default class EquipmentContent extends React.Component {
           return;
         }
 
-        // +++ Применяем сортировку по id
         const sortedEquipment = this.sortEquipmentById(equipmentData);
-
-        console.log('EquipmentContent: setting equipment data (sorted by id)', sortedEquipment);
         this.setState({
           equipment: sortedEquipment,
           loading: false
@@ -100,7 +93,6 @@ export default class EquipmentContent extends React.Component {
         } else if (employersData && employersData._embedded && employersData._embedded.employers) {
           employersData = employersData._embedded.employers;
         } else {
-          console.error('loadEmployers: unexpected format', employersData);
           employersData = [];
         }
 
@@ -184,7 +176,7 @@ export default class EquipmentContent extends React.Component {
         name: equipment.name || '',
         status: equipment.status || 'AVAILABLE',
         startDate: equipment.startDate || '',
-        employerId: equipment.employer ? equipment.employer.id : ''
+        employerId: equipment.employerId || (equipment.employer ? equipment.employer.id : '')
       },
       saving: false,
       error: null
@@ -230,7 +222,7 @@ export default class EquipmentContent extends React.Component {
     updateEquipment(editingEquipment.id, equipmentData)
       .then(() => {
         this.closeEditModal();
-        this.loadEquipment(); // перезагружает и сортирует
+        this.loadEquipment();
       })
       .catch(error => {
         console.error("updateEquipment error:", error);
@@ -251,15 +243,16 @@ export default class EquipmentContent extends React.Component {
     return (
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Equipment</h2>
+          <h2>Оборудование</h2>
           <button className="btn btn-success" onClick={this.openModal}>+ Добавить</button>
         </div>
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-        <EquipmentTable equipment={equipment} onEdit={this.openEditModal} />
+        {/* Передаём equipment, employers и onEdit */}
+        <EquipmentTable equipment={equipment} employers={employers} onEdit={this.openEditModal} />
 
-        {/* Модальное окно добавления оборудования */}
+        {/* Модальное окно добавления */}
         {showModal && (
           <div className="modal-overlay">
             <div className="modal-content">
@@ -334,7 +327,7 @@ export default class EquipmentContent extends React.Component {
           </div>
         )}
 
-        {/* Модальное окно редактирования оборудования */}
+        {/* Модальное окно редактирования */}
         {showEditModal && editingEquipment && (
           <div className="modal-overlay">
             <div className="modal-content">

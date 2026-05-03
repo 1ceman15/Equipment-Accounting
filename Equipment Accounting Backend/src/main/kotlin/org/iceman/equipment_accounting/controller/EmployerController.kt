@@ -17,7 +17,7 @@ class EmployerController(
     private val employerService: EmployerService
 ) {
     @GetMapping("/", "")
-    fun getAllEmployers(): ResponseEntity<List<Employer>> {
+    fun getAllEmployers(): ResponseEntity<List<EmployerModel>> {
         val employers = employerService.getAllEmployers()
         return ResponseEntity.ok(employers)
     }

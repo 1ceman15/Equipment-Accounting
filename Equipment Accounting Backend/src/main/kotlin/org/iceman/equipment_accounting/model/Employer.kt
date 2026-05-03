@@ -6,5 +6,5 @@ data class Employer(
     val name: String? = null,
     val lastName: String? = null,
     val age: Int? = null,
-    val departmentId: Long
+    val departmentId: Long? = null,
 )

@@ -118,7 +118,7 @@ export default class EmployersContent extends React.Component {
     return (
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Employers</h2>
+          <h2>Сотрудники</h2>
           <button className="btn btn-success" onClick={this.openModal}>+ Добавить</button>
         </div>
 
@@ -128,10 +128,10 @@ export default class EmployersContent extends React.Component {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Last name</th>
-              <th>Age</th>
-              <th>Department</th>
+              <th>Имя</th>
+              <th>Фамилия</th>
+              <th>Возраст</th>
+              <th>Департамент</th>
             </tr>
           </thead>
           <tbody>

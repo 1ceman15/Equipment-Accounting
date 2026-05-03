@@ -18,7 +18,7 @@ class EquipmentController(
     private val equipmentService: EquipmentService
 ) {
     @GetMapping("/", "")
-    fun getAllEquipment(): ResponseEntity<List<Equipment>> {
+    fun getAllEquipment(): ResponseEntity<List<EquipmentModel>> {
         val equipment = equipmentService.getAllEquipment()
         return ResponseEntity.ok(equipment)
     }
@@ -26,7 +26,7 @@ class EquipmentController(
     @GetMapping("/{id}")
     fun getEquipmentById(
         @PathVariable id: Long
-    ): ResponseEntity<Equipment> {
+    ): ResponseEntity<EquipmentModel> {
         val equipment = equipmentService.getEquipmentById(id)
         return ResponseEntity.ok(equipment)
     }
@@ -42,7 +42,7 @@ class EquipmentController(
     fun updateEquipment(
         @PathVariable id: Long,
         @RequestBody equipment: EquipmentModel
-    ): ResponseEntity<Equipment> {
+    ): ResponseEntity<EquipmentModel> {
         val updated = equipmentService.updateEquipment(id, equipment)
         return ResponseEntity.ok(updated)
     }

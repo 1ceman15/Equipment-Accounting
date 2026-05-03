@@ -40,21 +40,21 @@ class App extends React.Component {
                 className="menu-item"
                 onClick={() => this.setPage("equipment")}
               >
-                Equipment
+                Оборудование
               </li>
 
               <li
                 className="menu-item"
                 onClick={() => this.setPage("employers")}
               >
-                Employers
+                Сотрудники
               </li>
 
               <li
                 className="menu-item"
                 onClick={() => this.setPage("departments")}
               >
-                Departments
+                Департаменты
               </li>
 
             </ul>

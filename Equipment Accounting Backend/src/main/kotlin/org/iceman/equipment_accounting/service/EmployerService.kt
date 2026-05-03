@@ -8,5 +8,5 @@ interface EmployerService {
 
     fun getEmployerById(id: Long): Employer?
 
-    fun getAllEmployers(): List<Employer>
+    fun getAllEmployers(): List<EmployerModel>
 }
